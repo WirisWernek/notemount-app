@@ -15,9 +15,12 @@
     },
     "ios": {
       "supportsTablet": true,
-      "associatedDomains": ["applinks:*"]
+      "associatedDomains": [
+        "applinks:*"
+      ]
     },
     "android": {
+	  "versionCode": 2,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -35,7 +38,10 @@
               "scheme": "http"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         },
         {
           "action": "VIEW",
@@ -44,7 +50,10 @@
               "scheme": "notemount"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         },
         {
           "action": "SEND",
@@ -53,12 +62,20 @@
               "mimeType": "text/plain"
             }
           ],
-          "category": ["DEFAULT"]
+          "category": [
+            "DEFAULT"
+          ]
         }
-      ]
+      ],
+      "package": "com.wiris.notemountapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "757b50f8-4b36-4900-9aa8-9e6468292f3c"
+      }
     }
   }
 }
