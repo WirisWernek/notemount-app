@@ -1,65 +1,100 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StatusBar } from "expo-status-bar";
-import React from "react";
+import { Component } from "react";
 import {
-	StyleSheet,
-	Text,
-	TextInput,
-	TouchableOpacity,
-	View,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { convertUrlToEpub } from "./src/services/converter";
 
-export default function App() {
-  const [email, setEmail] = React.useState("");
-  const [website, setWebsite] = React.useState("");
+export default class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      email: "",
+      website: "",
+      loading: false,
+    };
+    this.process = this.process.bind(this);
+  }
 
-  async function process() {
-    try {
-      if (!email.trim()) {
-        alert('Por favor, digite um email válido');
-        return;
-      }
-      if (!website.trim()) {
-        alert('Por favor, digite uma URL válida');
-        return;
-      }
+  async componentDidMount() {
+    // alert("Ola");
+    await AsyncStorage.getItem("email").then((value) => {
+      this.setState({ email: value });
+    });
+  }
 
-      console.log('Processando:', { email, website });
-      const result = await convertUrlToEpub(website, email);
-      console.log('Resultado:', result);
-      alert('Conversão realizada com sucesso!');
-    } catch (error) {
-      console.error('Erro na conversão:', error);
-      alert('Erro ao processar a conversão. Verifique o console para mais detalhes.');
+  //ComponentDidUpdate - toda vez que uma state é atualizada faça algo
+  async componentDidUpdate(_, prevState) {
+    const email = this.state.email;
+    if (prevState.email !== email) {
+      await AsyncStorage.setItem("email", email);
     }
   }
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.emailView}>
-        <Text>Email</Text>
-        <TextInput
-          placeholder="Ex: user@example.com"
-          value={email}
-          onChangeText={(text) => setEmail(text)}
-          style={styles.emailInput}
-        />
+  async process() {
+    try {
+      const { email, website } = this.state;
+      if (!email.trim()) {
+        alert("Por favor, digite um email válido");
+        return;
+      }
+      if (!website.trim()) {
+        alert("Por favor, digite uma URL válida");
+        return;
+      }
+
+      this.setState({ loading: true });
+      console.log("Processando:", { email, website });
+      const result = await convertUrlToEpub(website, email);
+      console.log("Resultado:", result);
+      alert("Conversão realizada com sucesso!");
+    } catch (error) {
+      console.error("Erro na conversão:", error);
+      alert(
+        "Erro ao processar a conversão. Verifique o console para mais detalhes."
+      );
+    }
+    this.setState({ loading: false });
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <View style={styles.emailView}>
+          <Text>Email</Text>
+          <TextInput
+            placeholder="Ex: user@example.com"
+            value={this.state.email}
+            onChangeText={(text) => this.setState({ email: text })}
+            style={styles.emailInput}
+          />
+        </View>
+        <View style={styles.websiteView}>
+          <Text>Website</Text>
+          <TextInput
+            placeholder="Ex: www.example.com"
+            value={this.state.website}
+            onChangeText={(text) => this.setState({ website: text })}
+            style={styles.websiteInput}
+          />
+        </View>
+        <TouchableOpacity
+          onPress={this.process}
+          style={styles.botao}
+          disabled={this.state.loading}
+        >
+          <Text>Processar</Text>
+        </TouchableOpacity>
+        <StatusBar style="auto" />
+        {this.state.loading && <Text>Carregando...</Text>}
       </View>
-      <View style={styles.websiteView}>
-        <Text>Website</Text>
-        <TextInput
-          placeholder="Ex: www.example.com"
-          value={website}
-          onChangeText={(text) => setWebsite(text)}
-          style={styles.websiteInput}
-        />
-      </View>
-      <TouchableOpacity onPress={process} style={styles.botao}>
-        <Text>Processar</Text>
-      </TouchableOpacity>
-      <StatusBar style="auto" />
-    </View>
-  );
+    );
+  }
 }
 
 const styles = StyleSheet.create({
