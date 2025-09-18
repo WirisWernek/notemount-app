@@ -1,6 +1,6 @@
-async function convertUrlToEpub(link, email) {
+async function convertUrlToEpub(link, email, api) {
   try {
-    const response = await fetch('http://192.168.18.39:3000/convert', {
+    const response = await fetch(`${api}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
