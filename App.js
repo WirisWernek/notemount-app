@@ -1,5 +1,4 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as Linking from "expo-linking";
 import { StatusBar } from "expo-status-bar";
 import { Component } from "react";
 import {
@@ -27,57 +26,7 @@ export default class App extends Component {
     await AsyncStorage.getItem("email").then((value) => {
       this.setState({ email: value });
     });
-
-    // Verifica se o app foi aberto com uma URL (deep link)
-    const initialUrl = await Linking.getInitialURL();
-    if (initialUrl) {
-      this.handleIncomingURL(initialUrl);
-    }
-
-    // Listener para URLs recebidas quando o app já está aberto
-    const subscription = Linking.addEventListener("url", (event) => {
-      this.handleIncomingURL(event.url);
-    });
-
-    // Salva a subscription para cleanup
-    this.linkingSubscription = subscription;
   }
-
-  componentWillUnmount() {
-    // Remove o listener quando o component é desmontado
-    if (this.linkingSubscription) {
-      this.linkingSubscription.remove();
-    }
-  }
-
-  handleIncomingURL = (url) => {
-    try {
-      console.log("URL recebida:", url);
-      
-      // Remove o scheme personalizado se presente
-      let cleanUrl = url;
-      if (url.startsWith('notemount://')) {
-        cleanUrl = url.replace('notemount://', '');
-      }
-      
-      // Verifica se é uma URL válida
-      if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://')) {
-        this.setState({ website: cleanUrl });
-        console.log("Website preenchido com:", cleanUrl);
-      } else if (cleanUrl.includes('://')) {
-        // Se tem outro protocolo, mantém como está
-        this.setState({ website: cleanUrl });
-        console.log("Website preenchido:", cleanUrl);
-      } else {
-        // Se não tem protocolo, adiciona https://
-        cleanUrl = 'https://' + cleanUrl;
-        this.setState({ website: cleanUrl });
-        console.log("Website preenchido com protocolo adicionado:", cleanUrl);
-      }
-    } catch (error) {
-      console.error("Erro ao processar URL:", error);
-    }
-  };
 
   //ComponentDidUpdate - toda vez que uma state é atualizada faça algo
   async componentDidUpdate(_, prevState) {
